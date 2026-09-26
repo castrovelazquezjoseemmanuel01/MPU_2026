@@ -1,0 +1,163 @@
+---------------------------------------------
+OSHONSOFT Z80 ASSEMBLER LISTING
+Line   Addr Opcode      Label   Instruction
+---------------------------------------------
+0001   0000             ;José Emmanuel Castro Velázquez.
+0002   0000             ;Contador de letras
+0003   0000             
+0004   0000             ;Constantes
+0005   0000             LCD     EQU 40H
+0006   0000             KB      EQU 41H
+0007   0000             CW1     EQU 43H
+0008   0000             CW2     EQU 47H
+0009   0000             
+0010   0000             
+0011   0000             ; inicio de codigo
+0012   0000             
+0013   0000                     ORG 0000H
+0014   0000             
+0015   0000             ; PA -> Out ; PB -> In  ;  PC-F -> Out
+0016   0000             
+0017   0000 3E 82               LD A,82H
+0018   0002 D3 43               OUT (CW1),A
+0019   0004             
+0020   0004 3E 80               LD A,80H
+0021   0006 D3 47               OUT (CW2),A
+0022   0008             
+0023   0008             
+0024   0008             ; Stack Pointer
+0025   0008             
+0026   0008 31 00 F8            LD SP,F800H
+0027   000B             
+0028   000B             
+0029   000B             ; Contador de letras
+0030   000B             
+0031   000B 06 00               LD B,00H
+0032   000D             
+0033   000D             
+0034   000D 21 01 D8            LD HL,text1
+0035   0010 CD 58 00            CALL WR_txt
+0036   0013             
+0037   0013 CD 16 00            CALL RD_KB
+0038   0016             
+0039   0016             
+0040   0016             ; SUBRUTINES
+0041   0016             
+0042   0016             RD_KB:
+0043   0016 DB 41               IN A,(KB)
+0044   0018             
+0045   0018 FE 31               CP '1'
+0046   001A CA 4B 00            JP Z,no_Digit
+0047   001D             
+0048   001D FE 20               CP ' '
+0049   001F CA 46 00            JP Z,no_count
+0050   0022             
+0051   0022 FE 41               CP 'A'
+0052   0024 DA 3D 00            JP C,invalido
+0053   0027             
+0054   0027 FE 5B               CP 'Z'+1
+0055   0029 DA 39 00            JP C,valido
+0056   002C             
+0057   002C FE 61               CP 'a'
+0058   002E DA 3D 00            JP C,invalido
+0059   0031             
+0060   0031 FE 7B               CP 'z'+1
+0061   0033 DA 39 00            JP C,valido
+0062   0036             
+0063   0036 C3 3D 00            JP invalido
+0064   0039             
+0065   0039             valido:
+0066   0039 04                  INC B
+0067   003A C3 16 00            JP RD_KB
+0068   003D             
+0069   003D             invalido:
+0070   003D 21 21 D8            LD HL,text2
+0071   0040 CD 58 00            CALL WR_txt
+0072   0043 C3 16 00            JP RD_KB
+0073   0046             
+0074   0046             no_count:
+0075   0046 D3 40               OUT (LCD),A
+0076   0048 C3 16 00            JP RD_KB
+0077   004B             
+0078   004B             no_Digit:
+0079   004B 21 41 D8            LD HL,text3
+0080   004E CD 58 00            CALL WR_txt
+0081   0051             
+0082   0051 78                  LD A,B
+0083   0052 CD 65 00            CALL WR_digit
+0084   0055             
+0085   0055 C3 83 00            JP fin_programa
+0086   0058             
+0087   0058             WR_txt:
+0088   0058 7E                  LD A,(HL)
+0089   0059             
+0090   0059 FE 26               CP '&'
+0091   005B CA 64 00            JP Z,fin_texto
+0092   005E             
+0093   005E D3 40               OUT (LCD),A
+0094   0060             
+0095   0060 23                  INC HL
+0096   0061 C3 58 00            JP WR_txt
+0097   0064             
+0098   0064             fin_texto:
+0099   0064 C9                  RET
+0100   0065             
+0101   0065             WR_digit:
+0102   0065 0E 00               LD C,00H
+0103   0067             
+0104   0067             decenas:
+0105   0067 FE 0A               CP 10
+0106   0069 DA 72 00            JP C,unidades
+0107   006C             
+0108   006C D6 0A               SUB 10
+0109   006E 0C                  INC C
+0110   006F             
+0111   006F C3 67 00            JP decenas
+0112   0072             
+0113   0072             unidades:
+0114   0072 57                  LD D,A
+0115   0073             
+0116   0073 79                  LD A,C
+0117   0074 FE 00               CP 00H
+0118   0076 CA 7D 00            JP Z,mostrar_unidad
+0119   0079             
+0120   0079 C6 30               ADD A,'0'
+0121   007B D3 40               OUT (LCD),A
+0122   007D             
+0123   007D             mostrar_unidad:
+0124   007D 7A                  LD A,D
+0125   007E C6 30               ADD A,'0'
+0126   0080 D3 40               OUT (LCD),A
+0127   0082             
+0128   0082 C9                  RET
+0129   0083             
+0130   0083             fin_programa:
+0131   0083 C3 83 00            JP fin_programa
+0132   0086             
+0133   0086             
+0134   0086             ;Datos
+0135   0086                     ORG D801H
+0136   D801             
+0137   D801 49 6E 67 72 text1:  DB "Ingresa tu nombre y apellidos: &"
+0137   D805 65 73 61 20 
+0137   D809 74 75 20 6E 
+0137   D80D 6F 6D 62 72 
+0137   D811 65 20 79 20 
+0137   D815 61 70 65 6C 
+0137   D819 6C 69 64 6F 
+0137   D81D 73 3A 20 26 
+0138   D821 20 45 52 52 text2:  DB " ERROR: Solo letras y espacios &"
+0138   D825 4F 52 3A 20 
+0138   D829 53 6F 6C 6F 
+0138   D82D 20 6C 65 74 
+0138   D831 72 61 73 20 
+0138   D835 79 20 65 73 
+0138   D839 70 61 63 69 
+0138   D83D 6F 73 20 26 
+0139   D841 20 43 61 6E text3:  DB " Cantidad de letras: &"
+0139   D845 74 69 64 61 
+0139   D849 64 20 64 65 
+0139   D84D 20 6C 65 74 
+0139   D851 72 61 73 3A 
+0139   D855 20 26       
+Number of errors = 0
